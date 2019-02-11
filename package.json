@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/smallbatch-apps/truffle-artifact-compression#readme",
   "dependencies": {
-    "ast-functions": "^1.0.0",
+    "ast-functions": "^1.0.1",
     "chalk": "^2.4.2",
     "commander": "^2.19.0"
   },

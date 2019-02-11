@@ -3,11 +3,9 @@ const path = require('path');
 
 const { loadAll } = require('ast-functions');
 
-const { STRATEGY_KEEP_ALL, STRATEGY_LOAD_AST } = require('./utilities');
-
 const objectKeys = ['source', 'ast', 'legacyAST', 'sourceMap', 'deployedSourceMap', 'bytecode', 'deployedBytecode'];
 
-const processFiles = ({input, output, strategy, keep}) => {
+const processFiles = ({input, output, keep, astObject}) => {
   const readPath = path.resolve(process.cwd(), input);
   fs.readdir(readPath, (err, files) => {
     const jsonFilesArray = files
@@ -25,8 +23,10 @@ const processFiles = ({input, output, strategy, keep}) => {
 
     jsonFilesArray.forEach(file => {
       const inputFile = path.resolve(process.cwd(), input, file);
+      console.log(inputFile);
       const outputFile = path.resolve(process.cwd(), output, file);
-      compress(inputFile, outputFile, strategy, keep);
+      console.log(outputFile);
+      compress(inputFile, outputFile, keep, astObject);
     });
 
   });
@@ -38,22 +38,17 @@ const resolveFile = file => {
   return JSON.parse(fileContents);
 }
 
-const compress = (inputFile, outputFile, strategy, keepKeys) => {
+const compress = (inputFile, outputFile, keepKeys, astObject) => {
   const artifactObject = resolveFile(inputFile);
 
-  keysToRemove(strategy, keepKeys)
-    .forEach(key => delete artifactObject[key]);
-
-  if (strategy === STRATEGY_LOAD_AST) {
-    artifactObject.astObjects = loadAll(artifactObject.ast);
+  if (astObject) {
+    artifactObject.astObject = loadAll(artifactObject.ast);
   }
+
+  objectKeys.filter(key => !keepKeys.includes(key))
+    .forEach(key => delete artifactObject[key]);
 
   fs.writeFileSync(outputFile, JSON.stringify(artifactObject, null, 0));
 };
-
-const keysToRemove = (strategy, keepKeys) => {
-  if (strategy === STRATEGY_KEEP_ALL) return [];
-  return objectKeys.filter(key => !keepKeys.includes(key));
-}
 
 module.exports = { compress, processFiles };
