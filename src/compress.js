@@ -23,9 +23,7 @@ const processFiles = ({input, output, keep, astObject}) => {
 
     jsonFilesArray.forEach(file => {
       const inputFile = path.resolve(process.cwd(), input, file);
-      console.log(inputFile);
       const outputFile = path.resolve(process.cwd(), output, file);
-      console.log(outputFile);
       compress(inputFile, outputFile, keep, astObject);
     });
 
